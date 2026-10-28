@@ -9,7 +9,7 @@ document.addEventListener("click", async (event) => {
   const csrfToken = form.querySelector("[name=csrfmiddlewaretoken]").value;
 
   button.disabled = true;
-  status.textContent = "Generating…";
+  status.textContent = button.dataset.generating;
   status.classList.remove("status-error");
 
   try {
@@ -22,12 +22,12 @@ document.addEventListener("click", async (event) => {
       body: JSON.stringify({ text: japaneseField.value }),
     });
     const result = await response.json();
-    if (!response.ok) throw new Error(result.error || "Could not generate furigana.");
+    if (!response.ok) throw new Error(result.error || button.dataset.error);
 
     furiganaField.value = result.furigana;
-    status.textContent = "Generated. Check the readings, then save the card.";
+    status.textContent = button.dataset.generated;
   } catch (error) {
-    status.textContent = error.message || "Could not generate furigana.";
+    status.textContent = error.message || button.dataset.error;
     status.classList.add("status-error");
   } finally {
     button.disabled = false;
@@ -40,9 +40,9 @@ if (themeToggle) {
     document.documentElement.dataset.theme = theme;
     const isDark = theme === "dark";
     themeToggle.setAttribute("aria-pressed", String(isDark));
-    themeToggle.setAttribute("aria-label", `Switch to ${isDark ? "light" : "dark"} mode`);
+    themeToggle.setAttribute("aria-label", isDark ? themeToggle.dataset.switchLight : themeToggle.dataset.switchDark);
     themeToggle.querySelector(".theme-icon").textContent = isDark ? "☀" : "☾";
-    themeToggle.querySelector(".theme-label").textContent = isDark ? "Light mode" : "Dark mode";
+    themeToggle.querySelector(".theme-label").textContent = isDark ? themeToggle.dataset.labelLight : themeToggle.dataset.labelDark;
   };
 
   setTheme(document.documentElement.dataset.theme || "light");
@@ -55,4 +55,9 @@ if (themeToggle) {
     }
     setTheme(nextTheme);
   });
+}
+
+const languageSelect = document.querySelector("#language-select");
+if (languageSelect) {
+  languageSelect.addEventListener("change", () => languageSelect.form.requestSubmit());
 }

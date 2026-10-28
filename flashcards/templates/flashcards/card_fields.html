@@ -1,3 +1,4 @@
+{% load i18n %}
 <div class="form-field">
   {{ form.front.label_tag }}{{ form.front }}{{ form.front.errors }}
   {% if form.front.help_text %}<small class="field-help">{{ form.front.help_text }}</small>{% endif %}
@@ -5,7 +6,7 @@
 <div class="form-field">
   {{ form.front_furigana.label_tag }}{{ form.front_furigana }}{{ form.front_furigana.errors }}
   {% if form.front_furigana.help_text %}<small class="field-help">{{ form.front_furigana.help_text }}</small>{% endif %}
-  <button class="button button-light generate-furigana" type="button" data-url="{% url 'generate_furigana' %}">Generate furigana</button>
+  <button class="button button-light generate-furigana" type="button" data-url="{% url 'generate_furigana' %}" data-generating="{% trans 'Generating…' %}" data-generated="{% trans 'Generated. Check the readings, then save the card.' %}" data-empty="{% trans 'Enter Japanese text first.' %}" data-error="{% trans 'Could not generate furigana.' %}">{% trans "Generate furigana" %}</button>
   <span class="generation-status" aria-live="polite"></span>
 </div>
 <div class="form-field">

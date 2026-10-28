@@ -1,3 +1,4 @@
 {% extends 'flashcards/base.html' %}
+{% load i18n %}
 {% block title %}{{ title }} · Kaado{% endblock %}
-{% block content %}<a class="back-link" href="{% url 'deck_detail' deck.pk %}">← Back to deck</a><section class="form-page panel"><p class="eyebrow">DECK SETTINGS</p><h1>{{ title }}</h1><form method="post">{% csrf_token %}{{ form.as_p }}<div class="form-actions"><button class="button button-primary" type="submit">Save changes</button><a class="button button-light" href="{% url 'deck_detail' deck.pk %}">Cancel</a></div></form></section>{% endblock %}
+{% block content %}<a class="back-link" href="{% url 'deck_detail' deck.pk %}">← {% trans "Back to deck" %}</a><section class="form-page panel"><p class="eyebrow">{% trans "Deck settings" %}</p><h1>{{ title }}</h1><form method="post">{% csrf_token %}{{ form.as_p }}<div class="form-actions"><button class="button button-primary" type="submit">{% trans "Save changes" %}</button><a class="button button-light" href="{% url 'deck_detail' deck.pk %}">{% trans "Cancel" %}</a></div></form></section>{% endblock %}

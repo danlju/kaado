@@ -6,6 +6,7 @@ from django.core.paginator import Paginator
 from django.http import JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
+from django.utils.translation import gettext as _
 from .forms import CardForm, DeckForm
 from .models import Card, CardReview, Deck
 from .japanese import furigana_html, generate_furigana_markup
@@ -69,7 +70,10 @@ def study_start(request, pk):
     deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
     card_ids = list(deck.cards.values_list("id", flat=True))
     request.session[f"study_{deck.pk}"] = {
+        "version": 2,
         "card_ids": card_ids,
+        "total_cards": len(card_ids),
+        "correct_card_ids": [],
         "index": 0,
         "revealed": False,
         "session_id": str(uuid.uuid4()),
@@ -82,14 +86,20 @@ def study_session(request, pk):
     study = request.session.get(session_key)
     if study is None:
         return redirect("study_start", pk=deck.pk)
+    if study.get("version") != 2:
+        return redirect("study_start", pk=deck.pk)
     study.setdefault("session_id", str(uuid.uuid4()))
+    study.setdefault("total_cards", len(study["card_ids"]))
+    study.setdefault("correct_card_ids", [])
 
     if request.method == "POST":
         action = request.POST.get("action")
         if action == "show" and study["index"] < len(study["card_ids"]):
             study["revealed"] = True
         elif action in {"knew", "missed"} and study["revealed"]:
-            card_id = study["card_ids"][study["index"]]
+            queue = study["card_ids"]
+            index = study["index"]
+            card_id = queue[index]
             card = Card.objects.filter(pk=card_id, deck=deck).first()
             if card is not None:
                 CardReview.objects.create(
@@ -97,6 +107,16 @@ def study_session(request, pk):
                     knew_it=(action == "knew"),
                     session_id=study["session_id"],
                 )
+                pending = queue[index + 1:]
+                if action == "knew":
+                    if card_id not in study["correct_card_ids"]:
+                        study["correct_card_ids"].append(card_id)
+                    study["card_ids"] = queue[:index + 1] + [pending_id for pending_id in pending if pending_id != card_id]
+                elif card_id not in pending:
+                    queue.append(card_id)
+            else:
+                study["card_ids"] = queue[:index + 1] + [pending_id for pending_id in queue[index + 1:] if pending_id != card_id]
+                study["total_cards"] = max(0, study["total_cards"] - 1)
             study["index"] += 1
             study["revealed"] = False
         request.session[session_key] = study
@@ -104,10 +124,15 @@ def study_session(request, pk):
 
     card = None
     while study["index"] < len(study["card_ids"]):
-        card = Card.objects.filter(pk=study["card_ids"][study["index"]], deck=deck).first()
+        card_id = study["card_ids"][study["index"]]
+        card = Card.objects.filter(pk=card_id, deck=deck).first()
         if card is not None:
             break
-        study["index"] += 1
+        index = study["index"]
+        study["card_ids"] = study["card_ids"][:index] + [
+            pending_id for pending_id in study["card_ids"][index + 1:] if pending_id != card_id
+        ]
+        study["total_cards"] = max(0, study["total_cards"] - 1)
     request.session[session_key] = study
     complete = study["index"] >= len(study["card_ids"])
     summary = {"reviewed": 0, "knew": 0, "missed": 0}
@@ -128,8 +153,7 @@ def study_session(request, pk):
         "card": card,
         "complete": complete,
         "summary": summary,
-        "position": study["index"] + 1,
-        "progress_percent": round((study["index"] + 1) * 100 / len(study["card_ids"])) if study["card_ids"] else 100,
+        "progress_percent": round(len(study["correct_card_ids"]) * 100 / study["total_cards"]) if study["total_cards"] else 100,
     })
 
 @require_POST
@@ -138,9 +162,9 @@ def generate_furigana(request):
         payload = json.loads(request.body)
         text = payload.get("text", "")
     except (json.JSONDecodeError, UnicodeDecodeError, AttributeError):
-        return JsonResponse({"error": "Please provide valid Japanese text."}, status=400)
+        return JsonResponse({"error": _("Please provide valid Japanese text.")}, status=400)
     if not isinstance(text, str) or not text.strip():
-        return JsonResponse({"error": "Enter Japanese text first."}, status=400)
+        return JsonResponse({"error": _("Enter Japanese text first.")}, status=400)
     return JsonResponse({"furigana": generate_furigana_markup(text)})
 
 def deck_edit(request, pk):
@@ -149,7 +173,7 @@ def deck_edit(request, pk):
     if request.method == "POST" and form.is_valid():
         form.save()
         return redirect("deck_detail", pk=deck.pk)
-    return render(request, "flashcards/deck_form.html", {"deck": deck, "form": form, "title": "Edit deck"})
+    return render(request, "flashcards/deck_form.html", {"deck": deck, "form": form, "title": _("Edit deck")})
 
 def deck_delete(request, pk):
     deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
@@ -157,7 +181,8 @@ def deck_delete(request, pk):
         deck.delete()
         return redirect("deck_list")
     return render(request, "flashcards/confirm_delete.html", {
-        "item": deck, "item_type": "deck", "cancel_url": "deck_detail", "cancel_pk": deck.pk,
+        "item": deck, "item_type": "deck", "item_type_label": _("deck"),
+        "cancel_url": "deck_detail", "cancel_pk": deck.pk,
     })
 
 def card_edit(request, pk):
@@ -175,5 +200,6 @@ def card_delete(request, pk):
         card.delete()
         return redirect("deck_cards", pk=deck_pk)
     return render(request, "flashcards/confirm_delete.html", {
-        "item": card, "item_type": "card", "cancel_url": "deck_cards", "cancel_pk": deck_pk,
+        "item": card, "item_type": "card", "item_type_label": _("card"),
+        "cancel_url": "deck_cards", "cancel_pk": deck_pk,
     })

@@ -1,0 +1,383 @@
+# Japanese translations for Kaado.
+msgid ""
+msgstr ""
+"Project-Id-Version: Kaado\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-10-28 19:35+0900\n"
+"PO-Revision-Date: 2026-10-28 15:00+0900\n"
+"Last-Translator: Kaado\n"
+"Language-Team: Japanese\n"
+"Language: ja\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=1; plural=0;\n"
+
+#: flashcards/forms.py:8
+msgid "Deck name"
+msgstr "デッキ名"
+
+#: flashcards/forms.py:8
+msgid "Description"
+msgstr "説明"
+
+#: flashcards/forms.py:14 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:14
+msgid "Japanese"
+msgstr "日本語"
+
+#: flashcards/forms.py:15 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:16
+msgid "Furigana"
+msgstr "ふりがな"
+
+#: flashcards/forms.py:16 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:16
+msgid "Answer / definition"
+msgstr "解答・意味"
+
+#: flashcards/forms.py:19
+msgid "The original Japanese text."
+msgstr "日本語の原文です。"
+
+#: flashcards/forms.py:20
+msgid ""
+"Generated text uses [reading]word notation. You can edit it before saving."
+msgstr "生成結果は[読み]単語の形式です。保存前に編集できます。"
+
+#: flashcards/templates/flashcards/base.html:4
+#: flashcards/templates/flashcards/deck_list.html:3
+#: flashcards/templates/flashcards/deck_list.html:5
+msgid "My decks"
+msgstr "デッキ一覧"
+
+#: flashcards/templates/flashcards/base.html:4
+msgid "Interface language"
+msgstr "表示言語"
+
+#: flashcards/templates/flashcards/base.html:4
+msgid "Switch to dark mode"
+msgstr "ダークモードに切り替え"
+
+#: flashcards/templates/flashcards/base.html:4
+msgid "Dark mode"
+msgstr "ダークモード"
+
+#: flashcards/templates/flashcards/base.html:4
+msgid "Light mode"
+msgstr "ライトモード"
+
+#: flashcards/templates/flashcards/base.html:4
+msgid "Switch to light mode"
+msgstr "ライトモードに切り替え"
+
+#: flashcards/templates/flashcards/card_fields.html:9
+msgid "Generating…"
+msgstr "生成中…"
+
+#: flashcards/templates/flashcards/card_fields.html:9
+msgid "Generated. Check the readings, then save the card."
+msgstr "生成しました。読みを確認してからカードを保存してください。"
+
+#: flashcards/templates/flashcards/card_fields.html:9 flashcards/views.py:167
+msgid "Enter Japanese text first."
+msgstr "先に日本語を入力してください。"
+
+#: flashcards/templates/flashcards/card_fields.html:9
+msgid "Could not generate furigana."
+msgstr "ふりがなを生成できませんでした。"
+
+#: flashcards/templates/flashcards/card_fields.html:9
+msgid "Generate furigana"
+msgstr "ふりがなを生成"
+
+#: flashcards/templates/flashcards/card_form.html:3
+#: flashcards/templates/flashcards/card_form.html:4
+msgid "Edit card"
+msgstr "カードを編集"
+
+#: flashcards/templates/flashcards/card_form.html:4
+#, python-format
+msgid "Browse cards in %(deck_name)s"
+msgstr "%(deck_name)sのカード一覧"
+
+#: flashcards/templates/flashcards/card_form.html:4
+msgid "Card details"
+msgstr "カードの詳細"
+
+#: flashcards/templates/flashcards/card_form.html:4
+#: flashcards/templates/flashcards/deck_form.html:4
+msgid "Save changes"
+msgstr "変更を保存"
+
+#: flashcards/templates/flashcards/card_form.html:4
+#: flashcards/templates/flashcards/deck_form.html:4
+msgid "Cancel"
+msgstr "キャンセル"
+
+#: flashcards/templates/flashcards/card_list.html:3
+msgid "Browse"
+msgstr "一覧"
+
+#: flashcards/templates/flashcards/card_list.html:5
+#: flashcards/templates/flashcards/study.html:5
+#, python-format
+msgid "Back to %(deck_name)s"
+msgstr "%(deck_name)sに戻る"
+
+#: flashcards/templates/flashcards/card_list.html:6
+#: flashcards/templates/flashcards/deck_detail.html:5
+#: flashcards/templates/flashcards/deck_list.html:7
+#, python-format
+msgid "%(card_count)s card"
+msgid_plural "%(card_count)s cards"
+msgstr[0] "カード数：%(card_count)s"
+
+#: flashcards/templates/flashcards/card_list.html:6
+#: flashcards/templates/flashcards/deck_detail.html:5
+msgid "Browse cards"
+msgstr "カード一覧"
+
+#: flashcards/templates/flashcards/card_list.html:6
+#: flashcards/templates/flashcards/deck_detail.html:6
+msgid "Add a card"
+msgstr "カードを追加"
+
+#: flashcards/templates/flashcards/card_list.html:6
+#: flashcards/templates/flashcards/deck_detail.html:5
+#: flashcards/templates/flashcards/deck_list.html:7
+msgid "Study now"
+msgstr "今すぐ学習"
+
+#: flashcards/templates/flashcards/card_list.html:7
+msgid "Search this deck"
+msgstr "このデッキを検索"
+
+#: flashcards/templates/flashcards/card_list.html:7
+msgid "Japanese, furigana, or answer"
+msgstr "日本語、ふりがな、または解答"
+
+#: flashcards/templates/flashcards/card_list.html:7
+msgid "Search"
+msgstr "検索"
+
+#: flashcards/templates/flashcards/card_list.html:7
+msgid "Clear"
+msgstr "クリア"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#, python-format
+msgid "%(review_count)s review"
+msgid_plural "%(review_count)s reviews"
+msgstr[0] "レビュー回数：%(review_count)s"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#, python-format
+msgid "%(accuracy)s%% recall accuracy"
+msgstr "正答率：%(accuracy)s%%"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#, python-format
+msgid "Last studied %(date)s"
+msgstr "最終学習日：%(date)s"
+
+#: flashcards/templates/flashcards/card_list.html:8
+msgid "Not studied yet"
+msgstr "未学習"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/deck_list.html:7
+msgid "Edit"
+msgstr "編集"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/confirm_delete.html:3
+#: flashcards/templates/flashcards/deck_list.html:7
+msgid "Delete"
+msgstr "削除"
+
+#: flashcards/templates/flashcards/card_list.html:9
+msgid "No matching cards"
+msgstr "一致するカードがありません"
+
+#: flashcards/templates/flashcards/card_list.html:9
+msgid "Try another search, or clear it to see every card."
+msgstr ""
+"別の語句で検索するか、検索をクリアしてすべてのカードを表示してください。"
+
+#: flashcards/templates/flashcards/card_list.html:9
+msgid "No cards in this deck yet"
+msgstr "このデッキにはまだカードがありません"
+
+#: flashcards/templates/flashcards/card_list.html:9
+msgid "Add a card to get started."
+msgstr "カードを追加して始めましょう。"
+
+#: flashcards/templates/flashcards/card_list.html:10
+msgid "Card list pages"
+msgstr "カード一覧のページ"
+
+#: flashcards/templates/flashcards/card_list.html:10
+msgid "Previous"
+msgstr "前へ"
+
+#: flashcards/templates/flashcards/card_list.html:10
+#, python-format
+msgid "Page %(number)s of %(total)s"
+msgstr "%(total)sページ中 %(number)sページ"
+
+#: flashcards/templates/flashcards/card_list.html:10
+msgid "Next"
+msgstr "次へ"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+msgid "Please confirm"
+msgstr "確認してください"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+#, python-format
+msgid "Delete this %(item_type)s?"
+msgstr "この%(item_type)sを削除しますか？"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+#, python-format
+msgid "“%(item_name)s” will be permanently removed."
+msgstr "「%(item_name)s」を完全に削除します。"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+msgid "All cards in this deck will be deleted too."
+msgstr "このデッキのカードもすべて削除されます。"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+#, python-format
+msgid "Delete %(item_type)s"
+msgstr "%(item_type)sを削除"
+
+#: flashcards/templates/flashcards/confirm_delete.html:4
+msgid "Keep it"
+msgstr "残す"
+
+#: flashcards/templates/flashcards/deck_detail.html:4
+msgid "All decks"
+msgstr "すべてのデッキ"
+
+#: flashcards/templates/flashcards/deck_detail.html:5 flashcards/views.py:176
+msgid "Edit deck"
+msgstr "デッキを編集"
+
+#: flashcards/templates/flashcards/deck_detail.html:6
+msgid "Add card"
+msgstr "カードを追加"
+
+#: flashcards/templates/flashcards/deck_form.html:4
+#: flashcards/templates/flashcards/study.html:9
+msgid "Back to deck"
+msgstr "デッキに戻る"
+
+#: flashcards/templates/flashcards/deck_form.html:4
+msgid "Deck settings"
+msgstr "デッキ設定"
+
+#: flashcards/templates/flashcards/deck_list.html:5
+#, python-format
+msgid "%(deck_count)s deck"
+msgid_plural "%(deck_count)s decks"
+msgstr[0] "デッキ数：%(deck_count)s"
+
+#: flashcards/templates/flashcards/deck_list.html:5
+msgid "Create deck"
+msgstr "デッキを作成"
+
+#: flashcards/templates/flashcards/deck_list.html:5
+msgid "Create a deck"
+msgstr "デッキを作成"
+
+#: flashcards/templates/flashcards/deck_list.html:6
+msgid "Your decks"
+msgstr "デッキ一覧"
+
+#: flashcards/templates/flashcards/deck_list.html:8
+msgid "No decks yet"
+msgstr "デッキがありません"
+
+#: flashcards/templates/flashcards/deck_list.html:8
+msgid "Create a deck to get started."
+msgstr "デッキを作成して始めましょう。"
+
+#: flashcards/templates/flashcards/study.html:3
+#: flashcards/templates/flashcards/study.html:12
+msgid "Study"
+msgstr "学習"
+
+#: flashcards/templates/flashcards/study.html:7
+msgid "Session complete"
+msgstr "学習セッション完了"
+
+#: flashcards/templates/flashcards/study.html:8
+msgid "All cards were recalled correctly."
+msgstr "すべてのカードを正しく思い出せました。"
+
+#: flashcards/templates/flashcards/study.html:8
+#, python-format
+msgid "Review attempts: %(attempt_count)s"
+msgstr "解答回数：%(attempt_count)s"
+
+#: flashcards/templates/flashcards/study.html:8
+#: flashcards/templates/flashcards/study.html:17
+msgid "Didn't know"
+msgstr "わからなかった"
+
+#: flashcards/templates/flashcards/study.html:8
+#: flashcards/templates/flashcards/study.html:17
+msgid "Knew it"
+msgstr "わかった"
+
+#: flashcards/templates/flashcards/study.html:8
+msgid "This deck has no cards to study yet."
+msgstr "このデッキにはまだ学習できるカードがありません。"
+
+#: flashcards/templates/flashcards/study.html:9
+msgid "Study again"
+msgstr "もう一度学習"
+
+#: flashcards/templates/flashcards/study.html:12
+#, python-format
+msgid "Studying %(deck_name)s"
+msgstr "%(deck_name)sを学習中"
+
+#: flashcards/templates/flashcards/study.html:12
+#, python-format
+msgid "%(recalled)s of %(total)s cards recalled"
+msgstr "%(total)s枚中 %(recalled)s枚を正解"
+
+#: flashcards/templates/flashcards/study.html:15
+msgid "Show answer"
+msgstr "答えを表示"
+
+#: flashcards/templates/flashcards/study.html:17
+msgid "Did you remember it?"
+msgstr "思い出せましたか？"
+
+#: flashcards/views.py:165
+msgid "Please provide valid Japanese text."
+msgstr "有効な日本語のテキストを入力してください。"
+
+#: flashcards/views.py:184
+msgid "deck"
+msgstr "デッキ"
+
+#: flashcards/views.py:203
+msgid "card"
+msgstr "カード"
+
+#, python-format
+#~ msgid "You reviewed %(reviewed_count)s card."
+#~ msgid_plural "You reviewed %(reviewed_count)s cards."
+#~ msgstr[0] "%(reviewed_count)s枚のカードを復習しました。"
+
+#, python-format
+#~ msgid "%(position)s of %(total)s"
+#~ msgstr "%(total)s枚中 %(position)s枚目"
+
+#~ msgid "Apply"
+#~ msgstr "適用"

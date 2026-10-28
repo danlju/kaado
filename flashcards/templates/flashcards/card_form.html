@@ -1,3 +1,4 @@
 {% extends 'flashcards/base.html' %}
-{% block title %}Edit card · Kaado{% endblock %}
-{% block content %}<a class="back-link" href="{% url 'deck_cards' card.deck_id %}">← Browse cards in {{ card.deck.name }}</a><section class="form-page panel"><p class="eyebrow">CARD DETAILS</p><h1>Edit card</h1><form method="post">{% csrf_token %}{% include 'flashcards/card_fields.html' with form=form %}<div class="form-actions"><button class="button button-primary" type="submit">Save changes</button><a class="button button-light" href="{% url 'deck_cards' card.deck_id %}">Cancel</a></div></form></section>{% endblock %}
+{% load i18n %}
+{% block title %}{% trans "Edit card" %} · Kaado{% endblock %}
+{% block content %}<a class="back-link" href="{% url 'deck_cards' card.deck_id %}">← {% blocktrans with deck_name=card.deck.name %}Browse cards in {{ deck_name }}{% endblocktrans %}</a><section class="form-page panel"><p class="eyebrow">{% trans "Card details" %}</p><h1>{% trans "Edit card" %}</h1><form method="post">{% csrf_token %}{% include 'flashcards/card_fields.html' with form=form %}<div class="form-actions"><button class="button button-primary" type="submit">{% trans "Save changes" %}</button><a class="button button-light" href="{% url 'deck_cards' card.deck_id %}">{% trans "Cancel" %}</a></div></form></section>{% endblock %}
