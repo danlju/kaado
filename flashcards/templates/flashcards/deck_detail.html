@@ -1,0 +1,6 @@
+{% extends 'flashcards/base.html' %}
+{% block title %}{{ deck.name }} · Kaado{% endblock %}
+{% block content %}<a class="back-link" href="{% url 'deck_list' %}">← All decks</a>
+<section class="page-heading deck-heading"><div><p class="eyebrow">STUDY DECK · {{ card_count }} CARD{{ card_count|pluralize|upper }}</p><h1>{{ deck.name }}</h1>{% if deck.description %}<p class="lede">{{ deck.description }}</p>{% endif %}</div><div class="heading-actions">{% if card_count %}<a class="button button-primary" href="{% url 'study_start' deck.pk %}">Study now</a>{% endif %}<a class="button button-light" href="{% url 'deck_cards' deck.pk %}">Browse cards</a><a class="text-action" href="{% url 'deck_edit' deck.pk %}">Edit deck</a></div></section>
+<section class="panel add-card-panel deck-add-card"><p class="eyebrow">GROW YOUR DECK</p><h2>Add a card</h2><p class="muted">Add Japanese text, generate and review its furigana, then add the answer.</p><form method="post">{% csrf_token %}{% include 'flashcards/card_fields.html' with form=form %}<button class="button button-primary" type="submit">Add card <span aria-hidden="true">→</span></button></form></section>
+{% endblock %}

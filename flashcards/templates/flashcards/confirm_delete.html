@@ -1,0 +1,3 @@
+{% extends 'flashcards/base.html' %}
+{% block title %}Delete {{ item_type }} · Kaado{% endblock %}
+{% block content %}<section class="confirm-wrap"><div class="confirm-icon">!</div><section class="panel confirm-panel"><p class="eyebrow">PLEASE CONFIRM</p><h1>Delete this {{ item_type }}?</h1><p class="muted">“{% if item_type == 'deck' %}{{ item.name }}{% else %}{{ item.front }}{% endif %}” will be permanently removed.{% if item_type == 'deck' %} All cards in this deck will be deleted too.{% endif %}</p><form method="post">{% csrf_token %}<div class="form-actions"><button class="button button-danger" type="submit">Delete {{ item_type }}</button><a class="button button-light" href="{% url cancel_url cancel_pk %}">Keep it</a></div></form></section></section>{% endblock %}
