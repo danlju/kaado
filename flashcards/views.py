@@ -1,9 +1,11 @@
 import json
 import uuid
 
+from django.core.serializers.json import DjangoJSONEncoder
+from django.db import transaction
 from django.db.models import Count, Max, Q
 from django.core.paginator import Paginator
-from django.http import JsonResponse
+from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.utils.translation import gettext as _
@@ -41,6 +43,68 @@ def deck_detail(request, pk):
     return render(request, "flashcards/deck_detail.html", {
         "deck": deck, "card_count": deck.cards.count(), "form": form,
     })
+
+def deck_export(request, pk):
+    deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
+    payload = {
+        "format": "kaado-deck",
+        "version": 1,
+        "deck": {
+            "name": deck.name,
+            "description": deck.description,
+            "cards": list(deck.cards.values("front", "front_furigana", "back")),
+        },
+    }
+    response = HttpResponse(
+        json.dumps(payload, ensure_ascii=False, indent=2, cls=DjangoJSONEncoder),
+        content_type="application/json; charset=utf-8",
+    )
+    response["Content-Disposition"] = f'attachment; filename="deck-{deck.pk}.json"'
+    return response
+
+def deck_import(request):
+    error = None
+    if request.method == "POST":
+        uploaded_file = request.FILES.get("backup")
+        if uploaded_file is None:
+            error = _("Choose a Kaado deck backup file.")
+        elif uploaded_file.size > 5 * 1024 * 1024:
+            error = _("The backup file must be 5 MB or smaller.")
+        else:
+            try:
+                payload = json.loads(uploaded_file.read().decode("utf-8"))
+                deck_data = payload["deck"]
+                name = deck_data["name"]
+                description = deck_data.get("description", "")
+                cards = deck_data["cards"]
+                if payload.get("format") != "kaado-deck" or payload.get("version") != 1:
+                    raise ValueError
+                if not isinstance(name, str) or not name.strip() or len(name) > 120:
+                    raise ValueError
+                if not isinstance(description, str) or not isinstance(cards, list) or len(cards) > 10000:
+                    raise ValueError
+                cleaned_cards = []
+                for card in cards:
+                    if not isinstance(card, dict):
+                        raise ValueError
+                    front = card.get("front")
+                    furigana = card.get("front_furigana", "")
+                    back = card.get("back")
+                    if not isinstance(front, str) or not front.strip():
+                        raise ValueError
+                    if not isinstance(furigana, str) or not isinstance(back, str) or not back.strip():
+                        raise ValueError
+                    cleaned_cards.append({"front": front, "front_furigana": furigana, "back": back})
+            except (UnicodeDecodeError, json.JSONDecodeError, KeyError, TypeError, ValueError):
+                error = _("This file is not a valid Kaado deck backup.")
+            else:
+                with transaction.atomic():
+                    deck = Deck.objects.create(
+                        user=ensure_default_user(), name=name.strip(), description=description,
+                    )
+                    Card.objects.bulk_create([Card(deck=deck, **card) for card in cleaned_cards])
+                return redirect("deck_detail", pk=deck.pk)
+    return render(request, "flashcards/deck_import.html", {"error": error})
 
 def deck_cards(request, pk):
     deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())

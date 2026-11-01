@@ -19,6 +19,10 @@ Use **Study now** on a deck to review its cards in order. Reveal each answer and
 
 The deck page keeps the add-card form in view. Use **Browse cards** to search, paginate, edit, or delete cards without a long list pushing the form down.
 
+## Deck backups
+
+Use **Export backup** on a deck to download a UTF-8 JSON file containing the deck name, description, and cards (Japanese, furigana, and answer). **Import backup** on the deck list restores that file as a new deck. Review history and derived study statistics are not included. Imports accept Kaado deck backup files up to 5 MB and 10,000 cards.
+
 ## Interface languages
 
 The interface is available in English and Japanese. Choose a language from the header; this changes the app UI, not the language or content of your cards. English is the source language and Japanese translations are in `locale/ja/LC_MESSAGES/django.po`.
