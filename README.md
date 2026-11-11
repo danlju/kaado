@@ -19,6 +19,17 @@ Use **Study now** on a deck to review its cards in order. Reveal each answer and
 
 The deck page keeps the add-card form in view. Use **Browse cards** to search, paginate, edit, or delete cards without a long list pushing the form down.
 
+## Tests
+
+```sh
+python manage.py check
+python manage.py makemigrations --check --dry-run
+python manage.py test
+```
+
+GitHub Actions runs these checks on every push and pull request. You can also run
+the **Tests** workflow manually from the repository's Actions tab.
+
 ## Deck backups
 
 Use **Export backup** on a deck to download a UTF-8 JSON file containing the deck name, description, and cards (Japanese, furigana, and answer). **Import backup** on the deck list restores that file as a new deck. Review history and derived study statistics are not included. Imports accept Kaado deck backup files up to 5 MB and 10,000 cards.
