@@ -1,4 +1,5 @@
 import json
+import random
 import uuid
 
 from django.core.serializers.json import DjangoJSONEncoder
@@ -133,6 +134,7 @@ def deck_cards(request, pk):
 def study_start(request, pk):
     deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
     card_ids = list(deck.cards.values_list("id", flat=True))
+    random.shuffle(card_ids)
     request.session[f"study_{deck.pk}"] = {
         "version": 2,
         "card_ids": card_ids,
