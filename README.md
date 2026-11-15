@@ -15,7 +15,9 @@ Open http://127.0.0.1:8000/. A local `default` user is created automatically. De
 
 Cards store the original Japanese, an editable furigana field, and an answer/definition. Use **Generate furigana** to fill the furigana field in `[reading]word` notation, then check or correct it before saving. The deck page renders that saved field as ruby text. Automatic readings can be wrong, so review them.
 
-Use **Study now** on a deck to review its cards in order. Reveal each answer and mark whether you knew it. Cards marked **Didn’t know** return at the end of the queue and repeat until recalled correctly; the session finishes when all remaining cards have been answered correctly. Every response is saved as a card review event, so each card shows its review count, recall accuracy, and last studied date. Studying remains unrestricted; these records do not schedule cards or impose daily limits.
+Use **Study now** on a deck to review its cards in order. Reveal each answer and mark whether you knew it. Cards marked **Didn’t know** return at the end of the queue and repeat until recalled correctly; the session finishes when all remaining cards have been answered correctly. Use **Space** to reveal an answer, **1** for **Didn’t know**, and **2** for **Knew it**. Click **Undo last answer** or press **U** to reverse the most recent response, including after completing a session. Undo restores that card with its answer visible and removes the response from review history; only the latest response can be undone.
+
+Every response is saved as a card review event, so each card shows its review count, recall accuracy, and last studied date. Studying remains unrestricted; these records do not schedule cards or impose daily limits.
 
 The deck page keeps the add-card form in view. Use **Browse cards** to search, paginate, edit, or delete cards without a long list pushing the form down.
 
@@ -26,6 +28,8 @@ python manage.py check
 python manage.py makemigrations --check --dry-run
 python manage.py test
 ```
+
+Keyboard-handler regression tests can also be run with Node.js: `node --test tests/study-keyboard.test.cjs`.
 
 GitHub Actions runs these checks on every push and pull request. You can also run
 the **Tests** workflow manually from the repository's Actions tab.

@@ -3,6 +3,7 @@
 {% block title %}{% trans "Study" %} {{ deck.name }} · Kaado{% endblock %}
 {% block content %}
 <a class="back-link" href="{% url 'deck_detail' deck.pk %}">← {% blocktrans with deck_name=deck.name %}Back to {{ deck_name }}{% endblocktrans %}</a>
+<div data-study-controls>
 {% if complete %}
   <section class="study-complete panel"><p class="eyebrow">{% trans "Session complete" %}</p><h1>{% trans "Session complete" %}</h1>
     {% if summary.reviewed %}<p class="lede">{% trans "All cards were recalled correctly." %}</p><p class="muted">{% blocktrans with attempt_count=summary.reviewed %}Review attempts: {{ attempt_count }}{% endblocktrans %}</p><div class="session-results"><div class="result-missed"><strong>{{ summary.missed }}</strong><span>{% trans "Didn't know" %}</span></div><div class="result-knew"><strong>{{ summary.knew }}</strong><span>{% trans "Knew it" %}</span></div></div>{% else %}<p class="lede">{% trans "This deck has no cards to study yet." %}</p>{% endif %}
@@ -12,10 +13,15 @@
   <section class="study-topline"><div><p class="eyebrow">{% blocktrans with deck_name=deck.name %}Studying {{ deck_name }}{% endblocktrans %}</p><h1>{% trans "Study" %}</h1></div><span class="count-badge">{% blocktrans with recalled=study.correct_card_ids|length total=study.total_cards %}{{ recalled }} of {{ total }} cards recalled{% endblocktrans %}</span></section>
   <div class="progress-track"><span style="width:{{ progress_percent }}%"></span></div>
   <section class="study-prompt panel"><p class="card-label">{% trans "Japanese" %}</p><div class="study-front">{{ card.front|linebreaksbr }}</div>
-    {% if not study.revealed %}<form method="post">{% csrf_token %}<button class="button button-primary show-answer" type="submit" name="action" value="show">{% trans "Show answer" %} <span aria-hidden="true">↓</span></button></form>
+    {% if not study.revealed %}<form method="post">{% csrf_token %}<button class="button button-primary show-answer" type="submit" name="action" value="show" data-study-key=" " aria-keyshortcuts="Space">{% trans "Show answer" %} <span aria-hidden="true">↓</span></button></form>
     {% else %}<div class="study-answer"><div class="answer-reading"><p class="card-label">{% trans "Furigana" %}</p><div class="furigana-text">{{ card.front_furigana_html|linebreaksbr }}</div></div><div class="answer-definition"><p class="card-label">{% trans "Answer / definition" %}</p><div>{{ card.back|linebreaksbr }}</div></div></div>
-      <p class="recall-prompt">{% trans "Did you remember it?" %}</p><form method="post" class="recall-actions">{% csrf_token %}<button class="button button-danger" type="submit" name="action" value="missed">{% trans "Didn't know" %}</button><button class="button button-success" type="submit" name="action" value="knew">{% trans "Knew it" %}</button></form>
+      <p class="recall-prompt">{% trans "Did you remember it?" %}</p><form method="post" class="recall-actions">{% csrf_token %}<button class="button button-danger" type="submit" name="action" value="missed" data-study-key="1" aria-keyshortcuts="1">{% trans "Didn't know" %}</button><button class="button button-success" type="submit" name="action" value="knew" data-study-key="2" aria-keyshortcuts="2">{% trans "Knew it" %}</button></form>
     {% endif %}
   </section>
 {% endif %}
+{% if study.last_answer %}
+  <form method="post" class="form-actions">{% csrf_token %}<button class="button button-light" type="submit" name="action" value="undo" data-study-key="u" aria-keyshortcuts="U">{% trans "Undo last answer" %} (U)</button></form>
+{% endif %}
+<p class="muted">{% trans "Keyboard: Space to show answer · 1 Didn't know · 2 Knew it · U Undo" %}</p>
+</div>
 {% endblock %}

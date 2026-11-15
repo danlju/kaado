@@ -160,19 +160,36 @@ def study_session(request, pk):
 
     if request.method == "POST":
         action = request.POST.get("action")
-        if action == "show" and study["index"] < len(study["card_ids"]):
+        if action == "undo":
+            previous = study.pop("last_answer", None)
+            if previous is not None:
+                CardReview.objects.filter(
+                    pk=previous["review_id"],
+                    session_id=study["session_id"],
+                    card__deck=deck,
+                ).delete()
+                study.update(previous["state"])
+        elif action == "show" and study["index"] < len(study["card_ids"]):
             study["revealed"] = True
-        elif action in {"knew", "missed"} and study["revealed"]:
+        elif action in {"knew", "missed"} and study["revealed"] and study["index"] < len(study["card_ids"]):
             queue = study["card_ids"]
             index = study["index"]
             card_id = queue[index]
             card = Card.objects.filter(pk=card_id, deck=deck).first()
             if card is not None:
-                CardReview.objects.create(
+                previous_state = {
+                    "card_ids": list(queue),
+                    "correct_card_ids": list(study["correct_card_ids"]),
+                    "index": index,
+                    "total_cards": study["total_cards"],
+                    "revealed": True,
+                }
+                review = CardReview.objects.create(
                     card=card,
                     knew_it=(action == "knew"),
                     session_id=study["session_id"],
                 )
+                study["last_answer"] = {"review_id": review.pk, "state": previous_state}
                 pending = queue[index + 1:]
                 if action == "knew":
                     if card_id not in study["correct_card_ids"]:

@@ -61,3 +61,25 @@ const languageSelect = document.querySelector("#language-select");
 if (languageSelect) {
   languageSelect.addEventListener("change", () => languageSelect.form.requestSubmit());
 }
+
+const studyControls = document.querySelector("[data-study-controls]");
+if (studyControls) {
+  let submitting = false;
+  studyControls.addEventListener("submit", (event) => {
+    if (submitting) event.preventDefault();
+    submitting = true;
+  });
+  window.addEventListener("pageshow", () => { submitting = false; });
+  document.addEventListener("keydown", (event) => {
+    if (event.repeat || event.isComposing || event.ctrlKey || event.altKey || event.metaKey) return;
+    if (event.target.closest("input, textarea, select") || event.target.isContentEditable) return;
+    // Keep Space's native activation when a button or link has keyboard focus.
+    if (event.key === " " && event.target.closest("button, a")) return;
+    const key = event.key.toLowerCase();
+    const button = Array.from(studyControls.querySelectorAll("[data-study-key]"))
+      .find((candidate) => candidate.dataset.studyKey === key);
+    if (!button) return;
+    event.preventDefault();
+    if (!submitting) button.form.requestSubmit(button);
+  });
+}

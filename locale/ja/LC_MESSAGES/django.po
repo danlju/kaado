@@ -381,3 +381,9 @@ msgstr "カード"
 
 #~ msgid "Apply"
 #~ msgstr "適用"
+
+msgid "Undo last answer"
+msgstr "直前の回答を取り消す"
+
+msgid "Keyboard: Space to show answer · 1 Didn't know · 2 Knew it · U Undo"
+msgstr "キーボード：Space 答えを表示 · 1 思い出せなかった · 2 思い出せた · U 取り消し"
