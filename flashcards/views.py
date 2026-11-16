@@ -10,10 +10,11 @@ from django.http import HttpResponse, JsonResponse
 from django.shortcuts import get_object_or_404, redirect, render
 from django.views.decorators.http import require_POST
 from django.utils.translation import gettext as _
-from .forms import CardForm, DeckForm
+from .forms import CardForm, DeckForm, FreeStudyForm
 from .models import Card, CardReview, Deck
 from .japanese import furigana_html, generate_furigana_markup
 from .seed_default_user import ensure_default_user
+from .study import record_answer, scheduled_cards, struggling_card_ids, undo_answer
 def deck_list(request):
     user = ensure_default_user()
     if request.method == "POST":
@@ -25,8 +26,12 @@ def deck_list(request):
             return redirect("deck_detail", pk=deck.pk)
     else:
         form = DeckForm()
+    decks = list(user.decks.all())
+    for deck in decks:
+        due, new = scheduled_cards(deck)
+        deck.due_count, deck.new_count = len(due), len(new)
     return render(request, "flashcards/deck_list.html", {
-        "decks": user.decks.all(),
+        "decks": decks,
         "form": form,
         "show_create_form": request.method == "POST",
     })
@@ -41,8 +46,10 @@ def deck_detail(request, pk):
             return redirect("deck_detail", pk=deck.pk)
     else:
         form = CardForm()
+    due, new = scheduled_cards(deck)
     return render(request, "flashcards/deck_detail.html", {
         "deck": deck, "card_count": deck.cards.count(), "form": form,
+        "due_count": len(due), "new_count": len(new),
     })
 
 def deck_export(request, pk):
@@ -112,8 +119,10 @@ def deck_cards(request, pk):
     cards = deck.cards.annotate(
         review_count=Count("reviews"),
         correct_count=Count("reviews", filter=Q(reviews__knew_it=True)),
+        practice_count=Count("reviews", filter=Q(reviews__mode=CardReview.Mode.FREE)),
+        scheduled_count=Count("reviews", filter=Q(reviews__mode=CardReview.Mode.SCHEDULED)),
         last_reviewed=Max("reviews__reviewed_at"),
-    )
+    ).order_by("pk")
     search_query = request.GET.get("q", "").strip()
     if search_query:
         cards = cards.filter(
@@ -125,18 +134,17 @@ def deck_cards(request, pk):
     for card in page_obj.object_list:
         card.front_furigana_html = furigana_html(card.front_furigana or card.front)
         card.recall_accuracy = round(card.correct_count * 100 / card.review_count) if card.review_count else None
+    due, new = scheduled_cards(deck)
     return render(request, "flashcards/card_list.html", {
-        "deck": deck,
+        "deck": deck, "due_count": len(due), "new_count": len(new),
         "page_obj": page_obj,
         "search_query": search_query,
     })
 
-def study_start(request, pk):
-    deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
-    card_ids = list(deck.cards.values_list("id", flat=True))
-    random.shuffle(card_ids)
+def start_session(request, deck, card_ids, mode):
     request.session[f"study_{deck.pk}"] = {
-        "version": 2,
+        "version": 3,
+        "mode": mode,
         "card_ids": card_ids,
         "total_cards": len(card_ids),
         "correct_card_ids": [],
@@ -146,13 +154,44 @@ def study_start(request, pk):
     }
     return redirect("study_session", pk=deck.pk)
 
+
+def study_start(request, pk):
+    deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
+    due, new = scheduled_cards(deck)
+    return start_session(request, deck, due + new, CardReview.Mode.SCHEDULED)
+
+
+def free_study(request, pk):
+    deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
+    form = FreeStudyForm(
+        request.POST if request.method == "POST" else None,
+        initial=request.session.get("free_study_preferences", {"count": 15, "selection": "struggling"}),
+    )
+    if request.method == "POST" and form.is_valid():
+        count, selection = form.cleaned_data["count"], form.cleaned_data["selection"]
+        request.session["free_study_preferences"] = form.cleaned_data
+        if selection == "struggling":
+            card_ids = struggling_card_ids(deck)[:count]
+        else:
+            cards = deck.cards.all()
+            if selection == "new":
+                cards = cards.filter(reviews__isnull=True, due_at__isnull=True)
+            card_ids = list(cards.values_list("pk", flat=True))
+            random.shuffle(card_ids)
+            card_ids = card_ids[:count]
+        if card_ids:
+            return start_session(request, deck, card_ids, CardReview.Mode.FREE)
+        form.add_error(None, _("No cards match this selection. Try another option."))
+    return render(request, "flashcards/free_study.html", {"deck": deck, "form": form})
+
+
 def study_session(request, pk):
     deck = get_object_or_404(Deck, pk=pk, user=ensure_default_user())
     session_key = f"study_{deck.pk}"
     study = request.session.get(session_key)
     if study is None:
         return redirect("study_start", pk=deck.pk)
-    if study.get("version") != 2:
+    if study.get("version") != 3:
         return redirect("study_start", pk=deck.pk)
     study.setdefault("session_id", str(uuid.uuid4()))
     study.setdefault("total_cards", len(study["card_ids"]))
@@ -160,15 +199,14 @@ def study_session(request, pk):
 
     if request.method == "POST":
         action = request.POST.get("action")
+        study.pop("undo_unavailable", None)
         if action == "undo":
             previous = study.pop("last_answer", None)
             if previous is not None:
-                CardReview.objects.filter(
-                    pk=previous["review_id"],
-                    session_id=study["session_id"],
-                    card__deck=deck,
-                ).delete()
-                study.update(previous["state"])
+                if undo_answer(deck, study, previous["review_id"]) is not False:
+                    study.update(previous["state"])
+                else:
+                    study["undo_unavailable"] = True
         elif action == "show" and study["index"] < len(study["card_ids"]):
             study["revealed"] = True
         elif action in {"knew", "missed"} and study["revealed"] and study["index"] < len(study["card_ids"]):
@@ -184,11 +222,7 @@ def study_session(request, pk):
                     "total_cards": study["total_cards"],
                     "revealed": True,
                 }
-                review = CardReview.objects.create(
-                    card=card,
-                    knew_it=(action == "knew"),
-                    session_id=study["session_id"],
-                )
+                review = record_answer(card, action == "knew", study)
                 study["last_answer"] = {"review_id": review.pk, "state": previous_state}
                 pending = queue[index + 1:]
                 if action == "knew":

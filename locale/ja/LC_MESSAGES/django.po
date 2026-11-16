@@ -3,7 +3,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: Kaado\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2026-10-28 19:35+0900\n"
+"POT-Creation-Date: 2026-11-16 08:00+0900\n"
 "PO-Revision-Date: 2026-10-28 15:00+0900\n"
 "Last-Translator: Kaado\n"
 "Language-Team: Japanese\n"
@@ -13,37 +13,69 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "Plural-Forms: nplurals=1; plural=0;\n"
 
+#: flashcards/forms.py:7
+msgid "Number of cards"
+msgstr "カード枚数"
+
 #: flashcards/forms.py:8
+msgid "Cards to study"
+msgstr "学習するカード"
+
+#: flashcards/forms.py:9
+msgid "Struggling cards"
+msgstr "苦手なカード"
+
+#: flashcards/forms.py:10
+msgid "Random cards"
+msgstr "ランダムなカード"
+
+#: flashcards/forms.py:11
+msgid "New cards"
+msgstr "未学習のカード"
+
+#: flashcards/forms.py:18
 msgid "Deck name"
 msgstr "デッキ名"
 
-#: flashcards/forms.py:8
+#: flashcards/forms.py:18
 msgid "Description"
 msgstr "説明"
 
-#: flashcards/forms.py:14 flashcards/templates/flashcards/card_list.html:8
-#: flashcards/templates/flashcards/study.html:14
+#: flashcards/forms.py:24 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:17
 msgid "Japanese"
 msgstr "日本語"
 
-#: flashcards/forms.py:15 flashcards/templates/flashcards/card_list.html:8
-#: flashcards/templates/flashcards/study.html:16
+#: flashcards/forms.py:25 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:19
 msgid "Furigana"
 msgstr "ふりがな"
 
-#: flashcards/forms.py:16 flashcards/templates/flashcards/card_list.html:8
-#: flashcards/templates/flashcards/study.html:16
+#: flashcards/forms.py:26 flashcards/templates/flashcards/card_list.html:8
+#: flashcards/templates/flashcards/study.html:19
 msgid "Answer / definition"
 msgstr "解答・意味"
 
-#: flashcards/forms.py:19
+#: flashcards/forms.py:29
 msgid "The original Japanese text."
 msgstr "日本語の原文です。"
 
-#: flashcards/forms.py:20
+#: flashcards/forms.py:30
 msgid ""
 "Generated text uses [reading]word notation. You can edit it before saving."
 msgstr "生成結果は[読み]単語の形式です。保存前に編集できます。"
+
+#: flashcards/models.py:30 flashcards/templates/flashcards/study.html:15
+msgid "Scheduled study"
+msgstr "復習"
+
+#: flashcards/models.py:31 flashcards/templates/flashcards/free_study.html:3
+#: flashcards/templates/flashcards/free_study.html:8
+#: flashcards/templates/flashcards/study.html:12
+#: flashcards/templates/flashcards/study.html:15
+#: flashcards/templates/flashcards/study_actions.html:5
+msgid "Free study"
+msgstr "自由学習"
 
 #: flashcards/templates/flashcards/base.html:4
 #: flashcards/templates/flashcards/deck_list.html:3
@@ -79,7 +111,7 @@ msgstr "生成中…"
 msgid "Generated. Check the readings, then save the card."
 msgstr "生成しました。読みを確認してからカードを保存してください。"
 
-#: flashcards/templates/flashcards/card_fields.html:9 flashcards/views.py:167
+#: flashcards/templates/flashcards/card_fields.html:9 flashcards/views.py:284
 msgid "Enter Japanese text first."
 msgstr "先に日本語を入力してください。"
 
@@ -112,6 +144,7 @@ msgstr "変更を保存"
 
 #: flashcards/templates/flashcards/card_form.html:4
 #: flashcards/templates/flashcards/deck_form.html:4
+#: flashcards/templates/flashcards/deck_import.html:14
 msgid "Cancel"
 msgstr "キャンセル"
 
@@ -120,6 +153,7 @@ msgid "Browse"
 msgstr "一覧"
 
 #: flashcards/templates/flashcards/card_list.html:5
+#: flashcards/templates/flashcards/free_study.html:5
 #: flashcards/templates/flashcards/study.html:5
 #, python-format
 msgid "Back to %(deck_name)s"
@@ -142,12 +176,6 @@ msgstr "カード一覧"
 #: flashcards/templates/flashcards/deck_detail.html:6
 msgid "Add a card"
 msgstr "カードを追加"
-
-#: flashcards/templates/flashcards/card_list.html:6
-#: flashcards/templates/flashcards/deck_detail.html:5
-#: flashcards/templates/flashcards/deck_list.html:7
-msgid "Study now"
-msgstr "今すぐ学習"
 
 #: flashcards/templates/flashcards/card_list.html:7
 msgid "Search this deck"
@@ -173,6 +201,11 @@ msgstr[0] "レビュー回数：%(review_count)s"
 
 #: flashcards/templates/flashcards/card_list.html:8
 #, python-format
+msgid "%(scheduled)s scheduled · %(practice)s practice"
+msgstr "復習 %(scheduled)s回 · 自由学習 %(practice)s回"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#, python-format
 msgid "%(accuracy)s%% recall accuracy"
 msgstr "正答率：%(accuracy)s%%"
 
@@ -184,6 +217,11 @@ msgstr "最終学習日：%(date)s"
 #: flashcards/templates/flashcards/card_list.html:8
 msgid "Not studied yet"
 msgstr "未学習"
+
+#: flashcards/templates/flashcards/card_list.html:8
+#, python-format
+msgid "Next review: %(date)s"
+msgstr "次回の復習：%(date)s"
 
 #: flashcards/templates/flashcards/card_list.html:8
 #: flashcards/templates/flashcards/deck_list.html:7
@@ -258,10 +296,15 @@ msgid "Keep it"
 msgstr "残す"
 
 #: flashcards/templates/flashcards/deck_detail.html:4
+#: flashcards/templates/flashcards/deck_import.html:5
 msgid "All decks"
 msgstr "すべてのデッキ"
 
-#: flashcards/templates/flashcards/deck_detail.html:5 flashcards/views.py:176
+#: flashcards/templates/flashcards/deck_detail.html:5
+msgid "Export backup"
+msgstr "バックアップを書き出す"
+
+#: flashcards/templates/flashcards/deck_detail.html:5 flashcards/views.py:293
 msgid "Edit deck"
 msgstr "デッキを編集"
 
@@ -270,13 +313,41 @@ msgid "Add card"
 msgstr "カードを追加"
 
 #: flashcards/templates/flashcards/deck_form.html:4
-#: flashcards/templates/flashcards/study.html:9
+#: flashcards/templates/flashcards/study.html:12
 msgid "Back to deck"
 msgstr "デッキに戻る"
 
 #: flashcards/templates/flashcards/deck_form.html:4
 msgid "Deck settings"
 msgstr "デッキ設定"
+
+#: flashcards/templates/flashcards/deck_import.html:3
+#: flashcards/templates/flashcards/deck_list.html:5
+msgid "Import backup"
+msgstr "バックアップを読み込む"
+
+#: flashcards/templates/flashcards/deck_import.html:7
+msgid "Deck backup"
+msgstr "デッキのバックアップ"
+
+#: flashcards/templates/flashcards/deck_import.html:8
+msgid "Import a deck"
+msgstr "デッキを読み込む"
+
+#: flashcards/templates/flashcards/deck_import.html:9
+msgid ""
+"Choose a Kaado JSON backup. It will be added as a new deck with its cards."
+msgstr ""
+"KaadoのJSONバックアップを選んでください。カードとともに新しいデッキとして追加"
+"されます。"
+
+#: flashcards/templates/flashcards/deck_import.html:13
+msgid "Backup file"
+msgstr "バックアップファイル"
+
+#: flashcards/templates/flashcards/deck_import.html:14
+msgid "Import deck"
+msgstr "デッキを読み込む"
 
 #: flashcards/templates/flashcards/deck_list.html:5
 #, python-format
@@ -296,6 +367,17 @@ msgstr "デッキを作成"
 msgid "Your decks"
 msgstr "デッキ一覧"
 
+#: flashcards/templates/flashcards/deck_list.html:7
+#: flashcards/templates/flashcards/study_actions.html:3
+#, python-format
+msgid "%(count)s new"
+msgstr "新規：%(count)s枚"
+
+#: flashcards/templates/flashcards/deck_list.html:7
+#, python-format
+msgid "%(count)s to review"
+msgstr "復習：%(count)s枚"
+
 #: flashcards/templates/flashcards/deck_list.html:8
 msgid "No decks yet"
 msgstr "デッキがありません"
@@ -304,71 +386,146 @@ msgstr "デッキがありません"
 msgid "Create a deck to get started."
 msgstr "デッキを作成して始めましょう。"
 
+#: flashcards/templates/flashcards/free_study.html:9
+#: flashcards/templates/flashcards/study.html:8
+msgid "Practice is recorded. Review dates stay the same."
+msgstr "学習結果は記録されます。復習予定日は変わりません。"
+
+#: flashcards/templates/flashcards/free_study.html:13
+msgid ""
+"Struggling cards are chosen from recent misses across study sessions. New "
+"cards have never been studied. If fewer cards match, you'll study the "
+"available cards."
+msgstr ""
+"苦手なカードは、最近の学習セッションで間違えた記録から選ばれます。未学習の"
+"カードは一度も学習していないカードです。該当するカードが少ない場合は、ある分"
+"だけ学習します。"
+
+#: flashcards/templates/flashcards/free_study.html:14
+msgid "Start free study"
+msgstr "自由学習を始める"
+
 #: flashcards/templates/flashcards/study.html:3
-#: flashcards/templates/flashcards/study.html:12
 msgid "Study"
 msgstr "学習"
 
 #: flashcards/templates/flashcards/study.html:7
+msgid ""
+"This answer cannot be undone because the card has a newer scheduled review."
+msgstr "このカードには新しい復習記録があるため、この回答は取り消せません。"
+
+#: flashcards/templates/flashcards/study.html:8
+msgid ""
+"Your first answer to each card sets its next review date. Missed cards "
+"repeat for practice."
+msgstr ""
+"各カードへの最初の回答で次の復習予定日が決まります。間違えたカードは練習のた"
+"めに再出題されます。"
+
+#: flashcards/templates/flashcards/study.html:10
 msgid "Session complete"
 msgstr "学習セッション完了"
 
-#: flashcards/templates/flashcards/study.html:8
+#: flashcards/templates/flashcards/study.html:11
 msgid "All cards were recalled correctly."
 msgstr "すべてのカードを正しく思い出せました。"
 
-#: flashcards/templates/flashcards/study.html:8
+#: flashcards/templates/flashcards/study.html:11
 #, python-format
 msgid "Review attempts: %(attempt_count)s"
 msgstr "解答回数：%(attempt_count)s"
 
-#: flashcards/templates/flashcards/study.html:8
-#: flashcards/templates/flashcards/study.html:17
+#: flashcards/templates/flashcards/study.html:11
+#: flashcards/templates/flashcards/study.html:20
 msgid "Didn't know"
 msgstr "わからなかった"
 
-#: flashcards/templates/flashcards/study.html:8
-#: flashcards/templates/flashcards/study.html:17
+#: flashcards/templates/flashcards/study.html:11
+#: flashcards/templates/flashcards/study.html:20
 msgid "Knew it"
 msgstr "わかった"
 
-#: flashcards/templates/flashcards/study.html:8
-msgid "This deck has no cards to study yet."
-msgstr "このデッキにはまだ学習できるカードがありません。"
+#: flashcards/templates/flashcards/study.html:11
+#: flashcards/templates/flashcards/study_actions.html:4
+msgid "You're caught up"
+msgstr "今の復習は完了しています"
 
-#: flashcards/templates/flashcards/study.html:9
-msgid "Study again"
-msgstr "もう一度学習"
+#: flashcards/templates/flashcards/study.html:11
+msgid ""
+"No reviews or new cards are available right now. Free study is always "
+"available."
+msgstr ""
+"今学習する復習カードや新規カードはありません。自由学習はいつでもできます。"
 
-#: flashcards/templates/flashcards/study.html:12
+#: flashcards/templates/flashcards/study.html:15
 #, python-format
 msgid "Studying %(deck_name)s"
 msgstr "%(deck_name)sを学習中"
 
-#: flashcards/templates/flashcards/study.html:12
+#: flashcards/templates/flashcards/study.html:15
 #, python-format
 msgid "%(recalled)s of %(total)s cards recalled"
 msgstr "%(total)s枚中 %(recalled)s枚を正解"
 
-#: flashcards/templates/flashcards/study.html:15
+#: flashcards/templates/flashcards/study.html:18
 msgid "Show answer"
 msgstr "答えを表示"
 
-#: flashcards/templates/flashcards/study.html:17
+#: flashcards/templates/flashcards/study.html:20
 msgid "Did you remember it?"
 msgstr "思い出せましたか？"
 
-#: flashcards/views.py:165
+#: flashcards/templates/flashcards/study.html:25
+msgid "Undo last answer"
+msgstr "直前の回答を取り消す"
+
+#: flashcards/templates/flashcards/study.html:27
+msgid "Keyboard: Space to show answer · 1 Didn't know · 2 Knew it · U Undo"
+msgstr ""
+"キーボード：Space 答えを表示 · 1 思い出せなかった · 2 思い出せた · U 取り消し"
+
+#: flashcards/templates/flashcards/study_actions.html:3
+msgid "Study now"
+msgstr "今すぐ学習"
+
+#: flashcards/templates/flashcards/study_actions.html:3
+#, python-format
+msgid "%(count)s due"
+msgstr "復習：%(count)s枚"
+
+#: flashcards/views.py:78
+msgid "Choose a Kaado deck backup file."
+msgstr "Kaadoのデッキバックアップファイルを選んでください。"
+
+#: flashcards/views.py:80
+msgid "The backup file must be 5 MB or smaller."
+msgstr "バックアップファイルは5 MB以下にしてください。"
+
+#: flashcards/views.py:107
+msgid "This file is not a valid Kaado deck backup."
+msgstr "このファイルは有効なKaadoのデッキバックアップではありません。"
+
+#: flashcards/views.py:184
+msgid "No cards match this selection. Try another option."
+msgstr "該当するカードがありません。別の選択肢をお試しください。"
+
+#: flashcards/views.py:282
 msgid "Please provide valid Japanese text."
 msgstr "有効な日本語のテキストを入力してください。"
 
-#: flashcards/views.py:184
+#: flashcards/views.py:301
 msgid "deck"
 msgstr "デッキ"
 
-#: flashcards/views.py:203
+#: flashcards/views.py:320
 msgid "card"
 msgstr "カード"
+
+#~ msgid "This deck has no cards to study yet."
+#~ msgstr "このデッキにはまだ学習できるカードがありません。"
+
+#~ msgid "Study again"
+#~ msgstr "もう一度学習"
 
 #, python-format
 #~ msgid "You reviewed %(reviewed_count)s card."
@@ -381,9 +538,3 @@ msgstr "カード"
 
 #~ msgid "Apply"
 #~ msgstr "適用"
-
-msgid "Undo last answer"
-msgstr "直前の回答を取り消す"
-
-msgid "Keyboard: Space to show answer · 1 Didn't know · 2 Knew it · U Undo"
-msgstr "キーボード：Space 答えを表示 · 1 思い出せなかった · 2 思い出せた · U 取り消し"

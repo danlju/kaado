@@ -1,0 +1,17 @@
+{% extends 'flashcards/base.html' %}
+{% load i18n %}
+{% block title %}{% trans "Free study" %} · {{ deck.name }} · Kaado{% endblock %}
+{% block content %}
+<a class="back-link" href="{% url 'deck_detail' deck.pk %}">← {% blocktrans with deck_name=deck.name %}Back to {{ deck_name }}{% endblocktrans %}</a>
+<section class="panel form-page">
+  <p class="eyebrow">{{ deck.name }}</p>
+  <h1>{% trans "Free study" %}</h1>
+  <p class="muted">{% trans "Practice is recorded. Review dates stay the same." %}</p>
+  <form method="post">
+    {% csrf_token %}
+    {{ form.as_p }}
+    <p class="field-help">{% trans "Struggling cards are chosen from recent misses across study sessions. New cards have never been studied. If fewer cards match, you'll study the available cards." %}</p>
+    <button class="button button-primary" type="submit">{% trans "Start free study" %}</button>
+  </form>
+</section>
+{% endblock %}

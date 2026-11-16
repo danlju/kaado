@@ -1,0 +1,5 @@
+{% load i18n %}
+{% if due_count or new_count %}
+<a class="button button-primary" href="{% url 'study_start' deck.pk %}">{% trans "Study now" %}{% if not hide_counts %} · {% blocktrans with count=due_count %}{{ count }} due{% endblocktrans %}{% if new_count %} · {% blocktrans with count=new_count %}{{ count }} new{% endblocktrans %}{% endif %}{% endif %}</a>
+{% else %}<span class="muted">{% trans "You're caught up" %}</span>{% endif %}
+<a class="button {% if due_count or new_count %}button-light{% else %}button-primary{% endif %}" href="{% url 'free_study' deck.pk %}">{% trans "Free study" %}</a>
