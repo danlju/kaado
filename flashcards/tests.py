@@ -3,8 +3,10 @@ from django.test import TestCase
 from django.urls import reverse
 from django.utils import timezone
 from django.utils.translation import override
-from datetime import timedelta
+from datetime import datetime, timedelta
+from importlib import import_module
 from unittest.mock import patch
+from zoneinfo import ZoneInfo
 import uuid
 
 from .models import Card, CardReview, Deck
@@ -159,7 +161,7 @@ class SpacedRepetitionTests(TestCase):
         self.assertRedirects(response, self.url)
         self.assertEqual(self.client.session[f"study_{self.deck.pk}"]["card_ids"], [overdue.pk, due.pk, self.card.pk])
 
-    def test_new_card_allowance_resets_on_local_day_and_does_not_limit_due_cards(self):
+    def test_new_card_allowance_resets_on_study_day_and_does_not_limit_due_cards(self):
         now = timezone.now()
         for index in range(12):
             Card.objects.create(deck=self.deck, front=str(index), back="new")
@@ -174,11 +176,11 @@ class SpacedRepetitionTests(TestCase):
 
     def test_first_success_schedules_and_undo_restores_new_state(self):
         self.client.get(self.start)
-        now = timezone.now()
+        now = datetime(2026, 11, 17, 23, 30, tzinfo=ZoneInfo("Asia/Tokyo"))
         with patch("flashcards.study.timezone.now", return_value=now):
             self.answer("knew")
         self.card.refresh_from_db()
-        self.assertEqual(self.card.due_at, now + timedelta(days=1))
+        self.assertEqual(self.card.due_at, datetime(2026, 11, 18, 3, tzinfo=ZoneInfo("Asia/Tokyo")))
         self.assertEqual(self.card.interval_days, 1)
         self.assertEqual(self.card.introduced_at, now)
         review = CardReview.objects.get()
@@ -190,6 +192,61 @@ class SpacedRepetitionTests(TestCase):
         self.assertIsNone(self.card.introduced_at)
         self.assertEqual(self.card.interval_days, 0)
         self.assertFalse(CardReview.objects.exists())
+
+    def test_new_card_allowance_resets_at_three_am(self):
+        local_timezone = ZoneInfo("Asia/Tokyo")
+        introduced = datetime(2026, 11, 17, 23, 30, tzinfo=local_timezone)
+        for index in range(10):
+            Card.objects.create(
+                deck=self.deck, front=str(index), back="introduced",
+                introduced_at=introduced, due_at=introduced + timedelta(days=1),
+            )
+        # Check UTC inputs too: the boundary must use the configured local timezone.
+        for hour, minute in [(0, 0), (2, 59)]:
+            now = datetime(2026, 11, 18, hour, minute, tzinfo=local_timezone)
+            self.assertEqual(scheduled_cards(self.deck, now.astimezone(ZoneInfo("UTC")))[1], [])
+        boundary = datetime(2026, 11, 18, 3, tzinfo=local_timezone)
+        self.assertEqual(scheduled_cards(self.deck, boundary)[1], [self.card.pk])
+        self.card.introduced_at = boundary
+        self.card.due_at = boundary + timedelta(days=1)
+        self.card.save()
+        self.assertEqual(scheduled_cards(self.deck, boundary)[1], [])
+
+    def test_review_schedule_uses_study_day_and_becomes_due_at_three_am(self):
+        local_timezone = ZoneInfo("Asia/Tokyo")
+        for hour, interval, expected_day in [(1, 0, 18), (3, 0, 19), (23, 1, 21), (1, 3, 23)]:
+            with self.subTest(hour=hour, interval=interval):
+                now = datetime(2026, 11, 18, hour, tzinfo=local_timezone)
+                self.card.due_at = now - timedelta(days=1)
+                self.card.interval_days = interval
+                self.card.save()
+                with patch("flashcards.study.timezone.now", return_value=now):
+                    self.client.get(self.start)
+                    self.answer("knew")
+                self.card.refresh_from_db()
+                expected = datetime(2026, 11, expected_day, 3, tzinfo=local_timezone)
+                self.assertEqual(self.card.due_at, expected)
+                self.assertEqual(scheduled_cards(self.deck, expected - timedelta(microseconds=1))[0], [])
+                self.assertEqual(scheduled_cards(self.deck, expected)[0], [self.card.pk])
+
+    def test_existing_review_dates_and_undo_schedules_align_to_three_am(self):
+        from django.apps import apps
+        from django.db import connection
+
+        due = datetime(2026, 11, 18, 1, 30, tzinfo=ZoneInfo("Asia/Tokyo"))
+        self.card.due_at = due
+        self.card.save()
+        review = CardReview.objects.create(
+            card=self.card, knew_it=True,
+            previous_schedule={"due_at": due.isoformat(), "interval_days": 1, "introduced_at": None},
+        )
+        migration = import_module("flashcards.migrations.0005_align_review_day_start")
+        migration.align_review_day_start(apps, connection.schema_editor(atomic=False))
+        self.card.refresh_from_db()
+        review.refresh_from_db()
+        expected = due.replace(hour=3, minute=0)
+        self.assertEqual(self.card.due_at, expected)
+        self.assertEqual(datetime.fromisoformat(review.previous_schedule["due_at"]), expected)
 
     def test_success_grows_existing_interval_and_undo_restores_due_date(self):
         for old_interval, expected in [(1, 3), (3, 6), (200, 365)]:

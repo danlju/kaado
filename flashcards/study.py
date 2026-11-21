@@ -11,12 +11,24 @@ from .models import Card, CardReview
 
 
 DAILY_NEW_LIMIT = 10
+STUDY_DAY_START_HOUR = 3
+
+
+def study_day_start(now):
+    local_now = timezone.localtime(now)
+    start = local_now.replace(hour=STUDY_DAY_START_HOUR, minute=0, second=0, microsecond=0)
+    if local_now < start:
+        start -= timedelta(days=1)
+    return start
 
 
 def scheduled_cards(deck, now=None):
     now = now or timezone.now()
     due_ids = list(deck.cards.filter(due_at__lte=now).order_by("due_at", "pk").values_list("pk", flat=True))
-    introduced_today = deck.cards.filter(introduced_at__date=timezone.localdate(now)).count()
+    start = study_day_start(now)
+    introduced_today = deck.cards.filter(
+        introduced_at__gte=start, introduced_at__lt=start + timedelta(days=1),
+    ).count()
     allowance = max(0, DAILY_NEW_LIMIT - introduced_today)
     new_ids = list(deck.cards.filter(due_at__isnull=True).order_by("pk").values_list("pk", flat=True)[:allowance])
     return due_ids, new_ids
@@ -64,7 +76,7 @@ def record_answer(card, knew_it, study):
                 card.interval_days = 3
             else:
                 card.interval_days = min(card.interval_days * 2, 365)
-            card.due_at = now + timedelta(days=card.interval_days)
+            card.due_at = study_day_start(now) + timedelta(days=card.interval_days)
             card.introduced_at = card.introduced_at or now
             card.save(update_fields=["due_at", "interval_days", "introduced_at"])
     return CardReview.objects.create(
